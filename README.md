@@ -4,7 +4,7 @@ Simple ipfix receiver.
 
 Receive IPFIX from any source and outputs it as JSON, NULL, (postgres, sqlite and maybe others will come).
 
-Tested on mikrotik IPFIX and INVEA flowmonexp ipfix (INVEA is now FLOWMON .... wait .... FLOWMON is now Progress :-).
+Tested on mikrotik IPFIX and INVEA flowmonexp ipfix (INVEA is now FLOWMON .... wait .... FLOWMON is now Progress .... oops .... last known name is Kempes. Updates will follow).
 
 Missing fields can be simply added to ipfix.json.
 
