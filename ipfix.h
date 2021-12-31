@@ -72,7 +72,7 @@ typedef struct {
 class IPFIX: public QThread
 {
 public:
-	IPFIX(QJsonArray fieldDefs, long queueLimit, QJsonObject fixes, QJsonArray outputs, bool debug);
+	IPFIX(const QJsonArray fieldDefs, long queueLimit, const QJsonObject fixes, const QJsonArray outputs, bool debug);
 	~IPFIX();
 	void enqueue(const QByteArray &data, const QHostAddress &addr);
 	void next(const QByteArray &data, const QHostAddress &addr);

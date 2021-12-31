@@ -6,15 +6,15 @@
 #include "output_null.h"
 #include "output_stdout.h"
 
-IPFIX::IPFIX(QJsonArray fd, long ql, QJsonObject fixes, QJsonArray outputs, bool d) : debug(d), queueLimit(ql){
+IPFIX::IPFIX(const QJsonArray fd, long ql, const QJsonObject fixes, const QJsonArray outputs, bool d) : debug(d), queueLimit(ql){
 	mikrotikFixTimestamp = fixes.value("mikrotikFixTimestamp").toBool(false);
-	foreach(const auto &v, fd){
+	for(const auto &v : fd){
 		if(!v.isObject()){
 			qInfo() << "Invalid field:" << v;
 		} else {
 			QJsonObject o = v.toObject();
 			bool failed = false;
-			foreach(const auto &s, QStringList({"id","name","type"})){
+			for(const auto &s : QStringList({"id","name","type"})){
 				if(!o.contains(s) || !o.value(s).isString()){
 					qInfo() << "Missing or invalid field:" << s;
 					failed = true;
@@ -65,7 +65,7 @@ IPFIX::IPFIX(QJsonArray fd, long ql, QJsonObject fixes, QJsonArray outputs, bool
 	if(outputs.count() == 0){
 		qInfo() << "No output given ...";
 	} else {
-		foreach(const auto &v, outputs){
+		for(const auto &v : outputs){
 			if(!v.isObject() || !v.toObject().value("name").isString()){
 				qInfo() << "Invalid output:" << v;
 				continue;
@@ -84,7 +84,7 @@ IPFIX::IPFIX(QJsonArray fd, long ql, QJsonObject fixes, QJsonArray outputs, bool
 }
 
 IPFIX::~IPFIX(){
-	foreach(Output *o, outputList){
+	for(const auto &o : outputList){
 		if(o->isRunning()){
 			qInfo() << "Waiting for output finish";
 			o->requestInterruption();
@@ -325,7 +325,7 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 			row << output_field_t{"flowStartMilliseconds",msecs2string(realFlowStart),152,0,QByteArray(reinterpret_cast<const char*>(&stmp),8)};
 			row << output_field_t{"flowEndMilliseconds",msecs2string(realFlowEnd),153,0,QByteArray(reinterpret_cast<const char*>(&etmp),8)};
 		}
-		foreach(Output *o, outputList){
+		for(const auto &o : outputList){
 			o->enqueue(row);
 		}
 	}
