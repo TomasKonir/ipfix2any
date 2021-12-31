@@ -71,7 +71,7 @@ typedef struct {
 class IPFIX: public QThread
 {
 public:
-	IPFIX(QJsonArray fieldDefs, long queueLimit, bool mikrotikFixTimestamp, bool debug);
+	IPFIX(QJsonArray fieldDefs, long queueLimit, QJsonObject fixes, bool debug);
 	void enqueue(const QByteArray &data, const QHostAddress &addr);
 	void next(const QByteArray &data, const QHostAddress &addr);
 	void run();
@@ -86,6 +86,7 @@ private:
 	QHash<QString,field_def_t>      fieldDefs;
 	QHash<QString,ipfix_template_t> templates;
 	bool							mikrotikFixTimestamp;
+	bool							mikrotikFixTemplate260Is258;
 	QTextStream                     out;
 	bool                            debug;
 	QQueue<work_block_t>			queue;

@@ -3,7 +3,10 @@
 	"mode" : "udp",
 	"queueLimit" : 65536,
 	"debug" : false,
-	"mikrotikFixTimestamp" : true,
+	"fixes" : {
+		"mikrotikFixTemplate260Is258" : true,
+		"mikrotikFixTimestamp" : true
+	},
 	"fields" : [
 		{"id":"1",  "name":"octetDeltaCount",             "type":"unsigned"},
 		{"id":"2",  "name":"packetDeltaCount",            "type":"unsigned"},

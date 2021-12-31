@@ -107,9 +107,9 @@ int main(int argc, char *argv[]){
 
 	int queueLimit = jObj.value("queueLimit").toInt(8192);
 	bool debug = jObj.value("debug").toBool(false);
-	bool mikrotikFixTimestamp = jObj.value("mikrotikFixTimestamp").toBool(false);
+	QJsonObject fixes = jObj.value("fixes").toObject();
 	QString mode = jObj.value("mode").toString("udp");
-	IPFIX ipfix(jObj.value("fields").toArray(),queueLimit,mikrotikFixTimestamp,debug);
+	IPFIX ipfix(jObj.value("fields").toArray(),queueLimit,fixes,debug);
 
 
 	if(mode == "udp"){
