@@ -2,9 +2,9 @@
 
 Simple ipfix receiver.
 
-Receive as json. other targets will be added later.
+Receive IPFIX from any source and outputs it as JSON, NULL, (postgres, sqlite and maybe others will come).
 
-Tested on mikrotik IPFIX and INVEA flowmon ipfix.
+Tested on mikrotik IPFIX and INVEA flowmonexp ipfix (INVEA is now FLOWMON .... wait .... FLOWMON is now Progress :-).
 
 Missing fields can be simply added to ipfix.json.
 
@@ -18,4 +18,6 @@ qmake ../ipfix2any.pro
 
 make
 
-Usage: ipfix2any "[configFile|showDefault]"
+Usage: 
+
+    ipfix2any "[configFile|showDefault]"
