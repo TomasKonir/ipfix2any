@@ -18,3 +18,4 @@ qmake ../ipfix2any.pro
 
 make
 
+Usage: ipfix2any "[configFile|showDefault]"
