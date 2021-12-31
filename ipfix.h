@@ -88,7 +88,6 @@ private:
 	QHash<QString,field_def_t>      fieldDefs;
 	QHash<QString,ipfix_template_t> templates;
 	bool							mikrotikFixTimestamp;
-	bool							mikrotikFixTemplate260Is258;
 	bool                            debug;
 	QQueue<work_block_t>			queue;
 	long                            queueLimit;

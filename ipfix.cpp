@@ -8,7 +8,6 @@
 
 IPFIX::IPFIX(QJsonArray fd, long ql, QJsonObject fixes, QJsonArray outputs, bool d) : debug(d), queueLimit(ql){
 	mikrotikFixTimestamp = fixes.value("mikrotikFixTimestamp").toBool(false);
-	mikrotikFixTemplate260Is258 = fixes.value("mikrotikFixTemplate260Is258").toBool(false);
 	foreach(const auto &v, fd){
 		if(!v.isObject()){
 			qInfo() << "Invalid field:" << v;
@@ -265,9 +264,6 @@ void IPFIX::processTemplates(const char *data, long remain, QString ident){
 }
 
 void IPFIX::processDataset(const char *data, long remaing, int id, QString ident, quint32 exportTime){
-	if(mikrotikFixTemplate260Is258 && id == 260){
-		id = 258;
-	}
 	quint64 now = QDateTime::currentMSecsSinceEpoch();
 	QString index = ident + "_" + QString::number(id);
 	QString exportTimeString = QDateTime::fromSecsSinceEpoch(exportTime).toString("dd.MM.yyyyThh:mm:ss");

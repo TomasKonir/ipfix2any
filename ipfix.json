@@ -4,7 +4,6 @@
 	"queueLimit" : 65536,
 	"debug" : false,
 	"fixes" : {
-		"mikrotikFixTemplate260Is258" : true,
 		"mikrotikFixTimestamp" : true
 	},
 	"outputs" : [
