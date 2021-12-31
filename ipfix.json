@@ -7,6 +7,10 @@
 		"mikrotikFixTemplate260Is258" : true,
 		"mikrotikFixTimestamp" : true
 	},
+	"outputs" : [
+		{"name" : "null"},
+		{"name" : "stdout"}
+	],
 	"fields" : [
 		{"id":"1",  "name":"octetDeltaCount",             "type":"unsigned"},
 		{"id":"2",  "name":"packetDeltaCount",            "type":"unsigned"},

@@ -3,19 +3,21 @@
 #include <QJsonObject>
 #include "ipfix.h"
 #include "convert.h"
+#include "output_null.h"
+#include "output_stdout.h"
 
-IPFIX::IPFIX(QJsonArray fd, long ql, QJsonObject fixes, bool d) : out(stdout), debug(d), queueLimit(ql){
+IPFIX::IPFIX(QJsonArray fd, long ql, QJsonObject fixes, QJsonArray outputs, bool d) : debug(d), queueLimit(ql){
 	mikrotikFixTimestamp = fixes.value("mikrotikFixTimestamp").toBool(false);
 	mikrotikFixTemplate260Is258 = fixes.value("mikrotikFixTemplate260Is258").toBool(false);
-	foreach(QJsonValue v, fd){
+	foreach(const auto &v, fd){
 		if(!v.isObject()){
 			qInfo() << "Invalid field:" << v;
 		} else {
 			QJsonObject o = v.toObject();
 			bool failed = false;
-			foreach(QString s, QStringList({"id","name","type"})){
-				if(!o.contains(s)){
-					qInfo() << "Missing field:" << s;
+			foreach(const auto &s, QStringList({"id","name","type"})){
+				if(!o.contains(s) || !o.value(s).isString()){
+					qInfo() << "Missing or invalid field:" << s;
 					failed = true;
 					break;
 				}
@@ -61,7 +63,39 @@ IPFIX::IPFIX(QJsonArray fd, long ql, QJsonObject fixes, bool d) : out(stdout), d
 			}
 		}
 	}
+	if(outputs.count() == 0){
+		qInfo() << "No output given ...";
+	} else {
+		foreach(const auto &v, outputs){
+			if(!v.isObject() || !v.toObject().value("name").isString()){
+				qInfo() << "Invalid output:" << v;
+				continue;
+			}
+			QString name = v.toObject().value("name").toString();
+			if(name == "null"){
+				outputList << new OutputNull(queueLimit);
+			} else if(name == "stdout"){
+				outputList << new OutputStdout(queueLimit);
+			} else {
+				qInfo() << "Unknown output:" << name;
+			}
+		}
+	}
 	start();
+}
+
+IPFIX::~IPFIX(){
+	foreach(Output *o, outputList){
+		if(o->isRunning()){
+			qInfo() << "Waiting for output finish";
+			o->requestInterruption();
+			o->wait(5000);
+		}
+		if(!o->isRunning()){
+			delete(o);
+		}
+	}
+	outputList.clear();
 }
 
 void IPFIX::run(){
@@ -243,17 +277,14 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 		return;
 	}
 	ipfix_template_t t = templates.value(index);
-	QString line;
-	line.reserve(4096);
 	while(remaing >= t.baseSize){
-		line.clear();
-		line += "{";
-		line += "\"ident\" : \"" + ident + "\",";
-		line += "\"exportTime\" : \"" + exportTimeString + "\",";
-		line += "\"collectedTime\" : \"" + nowTimeString + "\"";
+		output_row_t row;
 		quint64 realFlowStart = 0;
 		quint64 realFlowEnd = 0;
 		quint64 systemStartup = 0;
+		row << output_field_t{"ident",ident,0,0,QByteArray()};
+		row << output_field_t{"exportTime",exportTimeString,0,0,exportTimeString.toUtf8()};
+		row << output_field_t{"collectedTime",nowTimeString,0,0,nowTimeString.toUtf8()};
 		for(int i=0;i<t.fields.count();i++){
 			ipfix_field_t f = t.fields.at(i);
 			int fl = f.fieldLength;
@@ -283,10 +314,7 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 					realFlowEnd = getUnsignedNum(data,fl);
 				}
 			}
-			line += ", \"";
-			line += f.name;
-			line += "\" : ";
-			line += f.convertFunc(data,fl);
+			row << output_field_t{f.name,f.convertFunc(data,fl),f.informationElementId,f.enterpriseNumber,QByteArray(data,fl)};
 			data += fl;
 			remaing -= fl;
 		}
@@ -296,12 +324,14 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 			}
 			realFlowStart += systemStartup;
 			realFlowEnd   += systemStartup;
-			line += ", \"flowStartMilliseconds\" : " + msecs2string(realFlowStart);
-			line += ", \"flowEndMilliseconds\" : " + msecs2string(realFlowEnd);
+			quint64 stmp = qToBigEndian(realFlowStart);
+			quint64 etmp = qToBigEndian(realFlowEnd);
+			row << output_field_t{"flowStartMilliseconds",msecs2string(realFlowStart),152,0,QByteArray(reinterpret_cast<const char*>(&stmp),8)};
+			row << output_field_t{"flowEndMilliseconds",msecs2string(realFlowEnd),153,0,QByteArray(reinterpret_cast<const char*>(&etmp),8)};
 		}
-		line += "}\n";
-		out << line;
-		out.flush();
+		foreach(Output *o, outputList){
+			o->enqueue(row);
+		}
 	}
 	if(remaing > 0){
 		if(debug) qInfo() << "Field padding:" << remaing;

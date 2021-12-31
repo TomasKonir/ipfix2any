@@ -108,8 +108,9 @@ int main(int argc, char *argv[]){
 	int queueLimit = jObj.value("queueLimit").toInt(8192);
 	bool debug = jObj.value("debug").toBool(false);
 	QJsonObject fixes = jObj.value("fixes").toObject();
+	QJsonArray outputs = jObj.value("outputs").toArray();
 	QString mode = jObj.value("mode").toString("udp");
-	IPFIX ipfix(jObj.value("fields").toArray(),queueLimit,fixes,debug);
+	IPFIX ipfix(jObj.value("fields").toArray(),queueLimit,fixes,outputs,debug);
 
 
 	if(mode == "udp"){

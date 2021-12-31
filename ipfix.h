@@ -11,6 +11,7 @@
 #include <QQueue>
 #include <QMutex>
 #include <QWaitCondition>
+#include "output.h"
 
 #define IPFIX_VERSION 10
 
@@ -71,7 +72,8 @@ typedef struct {
 class IPFIX: public QThread
 {
 public:
-	IPFIX(QJsonArray fieldDefs, long queueLimit, QJsonObject fixes, bool debug);
+	IPFIX(QJsonArray fieldDefs, long queueLimit, QJsonObject fixes, QJsonArray outputs, bool debug);
+	~IPFIX();
 	void enqueue(const QByteArray &data, const QHostAddress &addr);
 	void next(const QByteArray &data, const QHostAddress &addr);
 	void run();
@@ -87,12 +89,12 @@ private:
 	QHash<QString,ipfix_template_t> templates;
 	bool							mikrotikFixTimestamp;
 	bool							mikrotikFixTemplate260Is258;
-	QTextStream                     out;
 	bool                            debug;
 	QQueue<work_block_t>			queue;
 	long                            queueLimit;
 	QMutex						    mutex;
 	QWaitCondition                  waitCondition;
+	QList<Output*>					outputList;
 };
 
 #endif // IPFIX_H
