@@ -10,14 +10,11 @@ Missing fields can be simply added to ipfix.json.
 
 Compile like other qt projects with qmake and make.
 
-mkdir build
+    mkdir build
+    cd build
+    qmake ../ipfix2any.pro
+    make
 
-cd build
-
-qmake ../ipfix2any.pro
-
-make
-
-Usage: 
+Usage (default config is builtin): 
 
     ipfix2any "[configFile|showDefault]"
