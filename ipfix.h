@@ -14,6 +14,10 @@
 
 #define IPFIX_VERSION 10
 
+#define IPFIX_ELEMENT_STARTUP_TIME      160
+#define IPFIX_ELEMENT_FLOW_START_UPTIME  22
+#define IPFIX_ELEMENT_FLOW_END_UPTIME    21
+
 typedef QString (*fieldToString)(const char *data, long len);
 
 typedef struct {
@@ -67,7 +71,7 @@ typedef struct {
 class IPFIX: public QThread
 {
 public:
-	IPFIX(QJsonArray fieldDefs, long queueLimit, bool debug);
+	IPFIX(QJsonArray fieldDefs, long queueLimit, bool mikrotikFixTimestamp, bool debug);
 	void enqueue(const QByteArray &data, const QHostAddress &addr);
 	void next(const QByteArray &data, const QHostAddress &addr);
 	void run();
@@ -81,6 +85,7 @@ private:
 private:
 	QHash<QString,field_def_t>      fieldDefs;
 	QHash<QString,ipfix_template_t> templates;
+	bool							mikrotikFixTimestamp;
 	QTextStream                     out;
 	bool                            debug;
 	QQueue<work_block_t>			queue;

@@ -4,7 +4,7 @@
 #include "ipfix.h"
 #include "convert.h"
 
-IPFIX::IPFIX(QJsonArray fd,long ql,bool d) : out(stdout), debug(d), queueLimit(ql){
+IPFIX::IPFIX(QJsonArray fd, long ql, bool mft, bool d) : mikrotikFixTimestamp(mft), out(stdout), debug(d), queueLimit(ql){
 	foreach(QJsonValue v, fd){
 		if(!v.isObject()){
 			qInfo() << "Invalid field:" << v;
@@ -229,6 +229,7 @@ void IPFIX::processTemplates(const char *data, long remain, QString ident){
 }
 
 void IPFIX::processDataset(const char *data, long remaing, int id, QString ident, quint32 exportTime){
+	quint64 now = QDateTime::currentMSecsSinceEpoch();
 	QString index = ident + "_" + QString::number(id);
 	QString exportTimeString = QDateTime::fromSecsSinceEpoch(exportTime).toString("dd.MM.yyyyThh:mm:ss");
 	QString nowTimeString = QDateTime::currentDateTime().toString("dd.MM.yyyyThh:mm:ss.zzz");
@@ -245,6 +246,9 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 		line += "\"ident\" : \"" + ident + "\",";
 		line += "\"exportTime\" : \"" + exportTimeString + "\",";
 		line += "\"collectedTime\" : \"" + nowTimeString + "\"";
+		quint64 realFlowStart = 0;
+		quint64 realFlowEnd = 0;
+		quint64 systemStartup = 0;
 		for(int i=0;i<t.fields.count();i++){
 			ipfix_field_t f = t.fields.at(i);
 			int fl = f.fieldLength;
@@ -263,12 +267,32 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 				return;
 			}
 			if(debug) qInfo() << "Field:" << f.name << fl << remaing;
+			if(mikrotikFixTimestamp && !f.enterprise){
+				if(f.informationElementId == IPFIX_ELEMENT_STARTUP_TIME){
+					systemStartup = getUnsignedNum(data,fl);
+				}
+				if(f.informationElementId == IPFIX_ELEMENT_FLOW_START_UPTIME){
+					realFlowStart = getUnsignedNum(data,fl);
+				}
+				if(f.informationElementId == IPFIX_ELEMENT_FLOW_END_UPTIME){
+					realFlowEnd = getUnsignedNum(data,fl);
+				}
+			}
 			line += ", \"";
 			line += f.name;
 			line += "\" : ";
 			line += f.convertFunc(data,fl);
 			data += fl;
 			remaing -= fl;
+		}
+		if(mikrotikFixTimestamp && systemStartup > 0 && realFlowStart > 0 && realFlowEnd > 0){
+			while(now > systemStartup && (now - systemStartup) > 0x00000000FFFFFFFFULL){
+				systemStartup += 0x00000000FFFFFFFFULL;
+			}
+			realFlowStart += systemStartup;
+			realFlowEnd   += systemStartup;
+			line += ", \"flowStartMilliseconds\" : \"" + msecs2string(realFlowStart) + "\"";
+			line += ", \"flowEndMilliseconds\" : \"" + msecs2string(realFlowEnd) + "\"";
 		}
 		line += "}\n";
 		out << line;
