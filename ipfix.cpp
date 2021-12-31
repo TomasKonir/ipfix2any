@@ -291,8 +291,8 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 			}
 			realFlowStart += systemStartup;
 			realFlowEnd   += systemStartup;
-			line += ", \"flowStartMilliseconds\" : \"" + msecs2string(realFlowStart) + "\"";
-			line += ", \"flowEndMilliseconds\" : \"" + msecs2string(realFlowEnd) + "\"";
+			line += ", \"flowStartMilliseconds\" : " + msecs2string(realFlowStart);
+			line += ", \"flowEndMilliseconds\" : " + msecs2string(realFlowEnd);
 		}
 		line += "}\n";
 		out << line;
