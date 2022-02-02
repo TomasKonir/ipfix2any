@@ -105,11 +105,12 @@ IPFIX::~IPFIX(){
 
 void IPFIX::run(){
 	while(true){
+		mutex.lock();
 		if(!queue.isEmpty()){
 			work_block_t wb = queue.dequeue();
+			mutex.unlock();
 			next(wb.data,wb.addr);
 		} else {
-			mutex.lock();
 			waitCondition.wait(&mutex,1000);
 			mutex.unlock();
 		}
@@ -120,11 +121,13 @@ void IPFIX::run(){
 }
 
 void IPFIX::enqueue(const QByteArray &data, const QHostAddress &addr){
+	mutex.lock();
 	if(queue.count() > queueLimit){
 		qInfo() << "Queue limit reached";
 	}
 	queue.enqueue(work_block_t{data,addr});
 	waitCondition.wakeOne();
+	mutex.unlock();
 }
 
 
