@@ -1,5 +1,6 @@
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QDebug>
 #include "output_db.h"
 
 OutputDb::OutputDb(int queueLimit, const QJsonObject &params) : Output(queueLimit) {
