@@ -54,7 +54,7 @@ void OutputDb::openDb(){
 	}
 	if(!db.tables().contains(table)){
 		if(driver == "QPSQL"){
-			db.exec("CREATE TABLE IF NOT EXISTS " + table + "(flow JSONB NOT NULL)");
+			db.exec("CREATE TABLE IF NOT EXISTS " + table + "(id BIGSERIAL PRIMARY KEY NOT NULL, tstmp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, flow JSONB NOT NULL)");
 		} else {
 			db.exec("CREATE TABLE " + table + "(flow VARCHAR NOT NULL)");
 		}
