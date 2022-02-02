@@ -5,17 +5,8 @@ OutputStdout::OutputStdout(int queueLimit) : Output(queueLimit), out(stdout){
 
 }
 
-void OutputStdout::next(const output_row_t row){
-	out << "{";
-	bool coma = false;
-	foreach(const auto &f, row){
-		if(!coma){
-			coma = true;
-		} else {
-			out << ", ";
-		}
-		out << "\"" + f.name + "\" : " + f.value;
-	}
-	out << "}\n";
+void OutputStdout::next(const output_row_t &row){
+	out << row2json(row);
+	out << "\n";
 	out.flush();
 }

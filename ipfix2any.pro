@@ -1,5 +1,5 @@
 QT -= gui
-QT += network
+QT += network sql
 
 TARGET = ipfix2any
 
@@ -11,14 +11,16 @@ SOURCES += main.cpp \
 	ipfix.cpp \
 	output.cpp \
 	output_null.cpp \
-	output_stdout.cpp
+	output_stdout.cpp \
+	output_db.cpp
 
 HEADERS += \
 	convert.h \
 	ipfix.h \
 	output.h \
 	output_null.h \
-	output_stdout.h
+	output_stdout.h \
+	output_db.h
 
 RESOURCES += ipfix.qrc
 

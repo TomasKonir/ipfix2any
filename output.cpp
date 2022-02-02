@@ -21,10 +21,28 @@ void Output::run(){
 	}
 }
 
-void Output::enqueue(const output_row_t row){
+void Output::enqueue(const output_row_t &row){
 	if(queue.count() > queueLimit){
 		qInfo() << "Queue limit reached";
 	}
 	queue.enqueue(row);
 	waitCondition.wakeOne();
+}
+
+QString Output::row2json(const output_row_t &row){
+	QString ret;
+
+	ret = "{";
+	bool coma = false;
+	foreach(const auto &f, row){
+		if(!coma){
+			coma = true;
+		} else {
+			ret += ", ";
+		}
+		ret += "\"" + f.name + "\" : " + f.value;
+	}
+	ret += "}";
+
+	return(ret);
 }

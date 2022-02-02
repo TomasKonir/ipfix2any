@@ -5,6 +5,7 @@
 #include "convert.h"
 #include "output_null.h"
 #include "output_stdout.h"
+#include "output_db.h"
 
 IPFIX::IPFIX(const QJsonArray fd, long ql, const QJsonObject fixes, const QJsonArray outputs, bool d) : debug(d), queueLimit(ql){
 	mikrotikFixTimestamp = fixes.value("mikrotikFixTimestamp").toBool(false);
@@ -70,11 +71,15 @@ IPFIX::IPFIX(const QJsonArray fd, long ql, const QJsonObject fixes, const QJsonA
 				qInfo() << "Invalid output:" << v;
 				continue;
 			}
-			QString name = v.toObject().value("name").toString();
+			QJsonObject o = v.toObject();
+			QJsonObject params = o.value("params").toObject();
+			QString name = o.value("name").toString();
 			if(name == "null"){
 				outputList << new OutputNull(queueLimit);
 			} else if(name == "stdout"){
 				outputList << new OutputStdout(queueLimit);
+			} else if(name == "db"){
+				outputList << new OutputDb(queueLimit,params);
 			} else {
 				qInfo() << "Unknown output:" << name;
 			}
@@ -278,9 +283,9 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 		quint64 realFlowStart = 0;
 		quint64 realFlowEnd = 0;
 		quint64 systemStartup = 0;
-		row << output_field_t{"ident",ident,0,0,QByteArray()};
-		row << output_field_t{"exportTime",exportTimeString,0,0,exportTimeString.toUtf8()};
-		row << output_field_t{"collectedTime",nowTimeString,0,0,nowTimeString.toUtf8()};
+		row << output_field_t{"ident","\"" + ident + "\"",0,0,QByteArray()};
+		row << output_field_t{"exportTime","\"" + exportTimeString + "\"",0,0,exportTimeString.toUtf8()};
+		row << output_field_t{"collectedTime","\"" + nowTimeString + "\"",0,0,nowTimeString.toUtf8()};
 		for(int i=0;i<t.fields.count();i++){
 			ipfix_field_t f = t.fields.at(i);
 			int fl = f.fieldLength;

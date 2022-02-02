@@ -20,11 +20,14 @@ typedef QList<output_field_t> output_row_t;
 class Output : public QThread {
 public:
 	Output(int queueLimit);
-	void enqueue(const output_row_t row);
+	void enqueue(const output_row_t &row);
 	void run();
 
+	//helper
+	QString row2json(const output_row_t &row);
+
 	//need to be implemented in subclasses
-	virtual void next(const output_row_t row) = 0;
+	virtual void next(const output_row_t &row) = 0;
 
 protected:
 	int								queueLimit;

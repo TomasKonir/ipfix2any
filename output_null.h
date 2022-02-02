@@ -6,7 +6,7 @@
 class OutputNull : public Output {
 public:
 	OutputNull(int queueLimit);
-	void next(const output_row_t row) override;
+	void next(const output_row_t &row) override;
 };
 
 #endif

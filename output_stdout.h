@@ -7,7 +7,7 @@
 class OutputStdout : public Output {
 public:
 	OutputStdout(int queueLimit);
-	void next(const output_row_t row) override;
+	void next(const output_row_t &row) override;
 
 private:
 	QTextStream out;

@@ -146,7 +146,6 @@ QString convertString(const char *data, long length){
 	s = QString::fromUtf8(d.toJson(QJsonDocument::Compact));
 	s.remove(0,1);
 	s.remove(s.length() - 1,1);
-	qInfo().noquote() << s;
-	return(s);
+	return("\"" + s + "\"");
 }
 

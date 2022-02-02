@@ -7,7 +7,18 @@
 		"mikrotikFixTimestamp" : true
 	},
 	"outputs" : [
-		{"name" : "stdout"}
+		{
+			"name" : "db",
+			"params": {
+				"driver"  : "QSQLITE",
+				"host"    : "",
+				"port"    : 5432,
+				"dbName"  : "flows.db",
+				"user"    : "none",
+				"password": "",
+				"table"   : "flows"
+			}
+		}
 	],
 	"fields" : [
 		{"id":"1",  "name":"octetDeltaCount",             "type":"unsigned"},
