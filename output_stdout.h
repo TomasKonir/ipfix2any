@@ -2,6 +2,7 @@
 #define OUTPUT_STDOUT_H
 
 #include <QTextStream>
+#include <QHash>
 #include "output.h"
 
 class OutputStdout : public Output {
@@ -11,6 +12,7 @@ public:
 
 private:
 	QTextStream out;
+	QHash<QString,QString> compressTable;
 };
 
 #endif

@@ -16,7 +16,8 @@
 				"dbName"  : "tom",
 				"user"    : "tom",
 				"password": "flows",
-				"table"   : "flows"
+				"table"   : "flows",
+				"compressKeys" : true
 			}
 		}
 	],

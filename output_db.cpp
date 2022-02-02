@@ -17,6 +17,7 @@ OutputDb::OutputDb(int queueLimit, const QJsonObject &params) : Output(queueLimi
 	}
 	this->table = params.value("table").toString();
 	this->params = params;
+	this->compressKeys = params.value("compressKeys").toBool(false);
 	openDb();
 }
 
@@ -31,7 +32,25 @@ void OutputDb::next(const output_row_t &row){
 			return;
 		}
 	}
-	QString r = row2json(row);
+	QString r;
+	if(compressKeys){
+		QHash<QString,QString> added;
+		r = row2json(row,&compressTable,true,&added);
+		if(added.count()){
+			foreach(QString k, added.keys()){
+				QSqlQuery aq(db);
+				aq.prepare("INSERT INTO " + table + "_keys(name,value) VALUES(:name,:value)");
+				aq.addBindValue(k);
+				aq.addBindValue(added.value(k));
+				if(!aq.exec()){
+					qInfo().noquote() << "Query exec failed for:" << k << added.value(k);
+					qInfo() << "With error:" << aq.lastError().databaseText();
+				}
+			}
+		}
+	} else {
+		r = row2json(row);
+	}
 	QSqlQuery query(db);
 	query.prepare("INSERT INTO " + table + "(flow) VALUES(:row)");
 	query.addBindValue(r);
@@ -52,12 +71,30 @@ void OutputDb::openDb(){
 		qInfo() << "Unable to open database" << params;
 		return;
 	}
-	if(!db.tables().contains(table)){
+	if(!db.tables().contains(table) || !db.tables().contains(table + "_keys")){
 		if(driver == "QPSQL"){
 			db.exec("CREATE TABLE IF NOT EXISTS " + table + "(id BIGSERIAL PRIMARY KEY NOT NULL, tstmp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, flow JSONB NOT NULL)");
+			if(compressKeys){
+				db.exec("CREATE TABLE IF NOT EXISTS " + table + "_keys(name VARCHAR NOT NULL UNIQUE, value VARCHAR NOT NULL UNIQUE)");
+			}
 		} else {
 			db.exec("CREATE TABLE " + table + "(flow VARCHAR NOT NULL)");
+			if(compressKeys){
+				db.exec("CREATE TABLE " + table + "_keys(name VARCHAR NOT NULL, value VARCHAR NOT NULL)");
+			}
 		}
-		qInfo() << db.lastError().databaseText();
+		if(db.lastError().type() != QSqlError::NoError){
+			qInfo() << db.lastError().databaseText();
+		}
+	}
+	if(compressKeys){
+		qInfo() << "Loading compress table";
+		compressTable.clear();
+		QSqlQuery q = db.exec("SELECT name,value FROM " + table + "_keys");
+		while(q.next()){
+			compressTable.insert(q.value(0).toString(),q.value(1).toString());
+			qInfo() << q.value(0).toString() << q.value(1).toString();
+		}
+		qInfo() << "Compress table loaded";
 	}
 }
