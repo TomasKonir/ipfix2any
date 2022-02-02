@@ -56,6 +56,8 @@ IPFIX::IPFIX(const QJsonArray fd, long ql, const QJsonObject fixes, const QJsonA
 					fdt.convertFunc = convertUnsignedNumber;
 				} else if(type == "string"){
 					fdt.convertFunc = convertString;
+				} else if(type == "natEvent"){
+					fdt.convertFunc = convertNatEvent;
 				} else {
 					qInfo() << "Unknown type" << o;
 					fdt.convertFunc = convertAny;

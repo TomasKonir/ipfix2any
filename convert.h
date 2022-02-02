@@ -17,5 +17,6 @@ QString convertUptimeMs(const char *data, long length);
 QString convertDateTimeMs(const char *data, long length);
 QString convertTcpControlBits(const char *data, long length);
 QString convertString(const char *data, long length);
+QString convertNatEvent(const char *data, long length);
 
 #endif // CONVERT_H

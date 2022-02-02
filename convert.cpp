@@ -149,3 +149,87 @@ QString convertString(const char *data, long length){
 	return("\"" + s + "\"");
 }
 
+QString convertNatEvent(const char *data, long length){
+	quint64 e = getUnsignedNum(data,length);
+	QString ret;
+	switch(e){
+		case 0:	{
+				ret = "Reserved";
+				break;
+			}
+		case 1:	{
+				ret = "NAT translation create";
+				break;
+			}
+		case 2:	{	ret = "NAT translation delete";
+				break;
+			}
+		case 3:	{
+				ret = "NAT Addresses exhausted";
+				break;
+			}
+		case 4:	{
+				ret = "NAT44 session create";
+				break;
+			}
+		case 5:	{
+				ret = "NAT44 session delete";
+				break;
+			}
+		case 6:	{
+				ret = "NAT64 session create";
+				break;
+			}
+		case 7:	{
+				ret = "NAT64 session delete";
+				break;
+			}
+		case 8:	{
+				ret = "NAT44 BIB create";
+				break;
+			}
+		case 9:	{
+				ret = "NAT44 BIB delete";
+				break;
+			}
+		case 10: {
+				ret = "NAT64 BIB create";
+				break;
+			}
+		case 11: {
+				ret = "NAT64 BIB delete";
+				break;
+			}
+		case 12: {
+				ret = "NAT ports exhausted";
+				break;
+			}
+		case 13: {
+				ret = "Quota Exceeded";
+				break;
+			}
+		case 14: {
+				ret = "Address binding create";
+				break;
+			}
+		case 15: {
+				ret = "Address binding delete";
+				break;
+			}
+		case 16: {
+				ret = "Port block allocation";
+				break;
+			}
+		case 17: {
+				ret = "Port block de-allocation";
+				break;
+			}
+		case 18: {
+				ret = "Threshold Reached";
+				break;
+			}
+		default: ret = QString::number(e);
+	}
+	return(ret);
+}
+
