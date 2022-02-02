@@ -230,6 +230,6 @@ QString convertNatEvent(const char *data, long length){
 			}
 		default: ret = QString::number(e);
 	}
-	return(ret);
+	return("\"" + ret + "\"");
 }
 
