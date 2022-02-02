@@ -13,6 +13,7 @@ OutputDb::OutputDb(int queueLimit, const QJsonObject &params) : Output(queueLimi
 	this->driver = params.value("driver").toString();
 	if(!db.isDriverAvailable(driver)){
 		qInfo() << "Driver not available:" << driver;
+		return;
 	}
 	this->table = params.value("table").toString();
 	this->params = params;
