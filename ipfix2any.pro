@@ -25,6 +25,6 @@ HEADERS += \
 RESOURCES += ipfix.qrc
 
 #Compile with asan sometimes
-LIBS           += -lasan
-QMAKE_LFLAGS   += -lasan -fsanitize=address
+#LIBS           += -lasan
+#QMAKE_LFLAGS   += -lasan -fsanitize=address
 
