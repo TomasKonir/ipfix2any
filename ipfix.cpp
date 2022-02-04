@@ -289,9 +289,10 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 		quint64 realFlowStart = 0;
 		quint64 realFlowEnd = 0;
 		quint64 systemStartup = 0;
-		row << output_field_t{"ident","\"" + ident + "\"",0,0,QByteArray()};
-		row << output_field_t{"exportTime","\"" + exportTimeString + "\"",0,0,exportTimeString.toUtf8()};
-		row << output_field_t{"collectedTime","\"" + nowTimeString + "\"",0,0,nowTimeString.toUtf8()};
+		row.templateId = index;
+		row.fields << output_field_t{"ident","\"" + ident + "\"",0,0,QByteArray()};
+		row.fields << output_field_t{"exportTime","\"" + exportTimeString + "\"",0,0,exportTimeString.toUtf8()};
+		row.fields << output_field_t{"collectedTime","\"" + nowTimeString + "\"",0,0,nowTimeString.toUtf8()};
 		for(int i=0;i<t.fields.count();i++){
 			ipfix_field_t f = t.fields.at(i);
 			int fl = f.fieldLength;
@@ -321,7 +322,7 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 					realFlowEnd = getUnsignedNum(data,fl);
 				}
 			}
-			row << output_field_t{f.name,f.convertFunc(data,fl),f.informationElementId,f.enterpriseNumber,QByteArray(data,fl)};
+			row.fields << output_field_t{f.name,f.convertFunc(data,fl),f.informationElementId,f.enterpriseNumber,QByteArray(data,fl)};
 			data += fl;
 			remaing -= fl;
 		}
@@ -333,8 +334,8 @@ void IPFIX::processDataset(const char *data, long remaing, int id, QString ident
 			realFlowEnd   += systemStartup;
 			quint64 stmp = qToBigEndian(realFlowStart);
 			quint64 etmp = qToBigEndian(realFlowEnd);
-			row << output_field_t{"flowStartMilliseconds",msecs2string(realFlowStart),152,0,QByteArray(reinterpret_cast<const char*>(&stmp),8)};
-			row << output_field_t{"flowEndMilliseconds",msecs2string(realFlowEnd),153,0,QByteArray(reinterpret_cast<const char*>(&etmp),8)};
+			row.fields << output_field_t{"flowStartMilliseconds",msecs2string(realFlowStart),152,0,QByteArray(reinterpret_cast<const char*>(&stmp),8)};
+			row.fields << output_field_t{"flowEndMilliseconds",msecs2string(realFlowEnd),153,0,QByteArray(reinterpret_cast<const char*>(&etmp),8)};
 		}
 		for(const auto &o : outputList){
 			o->enqueue(row);

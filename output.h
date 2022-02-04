@@ -15,7 +15,10 @@ typedef struct {
 	QByteArray raw;
 }output_field_t;
 
-typedef QList<output_field_t> output_row_t;
+typedef struct {
+	QString					templateId;
+	QList<output_field_t>	fields;
+} output_row_t;
 
 class Output : public QThread {
 public:

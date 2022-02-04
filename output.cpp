@@ -68,7 +68,7 @@ QString Output::row2json(const output_row_t &row, QHash<QString,QString> *compre
 
 	ret = "{";
 	bool coma = false;
-	foreach(const auto &f, row){
+	foreach(const auto &f, row.fields){
 		if(!coma){
 			coma = true;
 		} else {
