@@ -3,7 +3,6 @@
 
 OutputStdout::OutputStdout(int queueLimit) : Output(queueLimit), out(stdout){
 	//just for super constructor
-
 }
 
 

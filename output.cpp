@@ -1,30 +1,38 @@
 #include <QDebug>
 #include "output.h"
 
-static const QString charTable = "abcdefghijklmnopqrstuvwxyz";
+static const QString charTable("abcdefghijklmnopqrstuvwxyz");
 
 static QString nextval(QHash<QString,QString> *compressTable){
-	QString val;
 	QStringList vals = compressTable->values();
-	QString maxVal;
-	foreach(QString v,vals){
-		if(maxVal.length() < v.length() || maxVal < v){
-			maxVal = v;
+	int base = charTable.count();
+	quint64 max = 0;
+	foreach(QString v, vals){
+		quint64 mult = 1;
+		quint64 m = 0;
+		foreach(QChar c, v){
+			int index = charTable.indexOf(c);
+			if(index >= 0){
+				m += index * mult;
+				mult *= base;
+			}
+		}
+		if(m > max){
+			max = m;
 		}
 	}
-	if(maxVal.length() == 0){
-		val = charTable[0];
-	} else {
-		QChar last = maxVal[maxVal.count() - 1];
-		int pos = charTable.indexOf(last);
-		if(pos < 0 || pos == (charTable.count() - 1)){
-			val = maxVal + charTable[0];
-		} else {
-			val = maxVal;
-			val[val.count() - 1] = charTable[pos+1];
-		}
+
+	if(vals.count()){
+		max++;
 	}
-	return(val);
+
+	QString ret("");
+	do {
+		ret += charTable.at(max % base);
+		max /= base;
+	} while(max > 0);
+
+	return(ret);
 }
 
 Output::Output(int ql) : queueLimit(ql){
