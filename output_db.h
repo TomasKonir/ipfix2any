@@ -3,11 +3,13 @@
 
 #include <QSqlDatabase>
 #include <QJsonObject>
+#include <QDateTime>
 #include "output.h"
 
 class OutputDb : public Output {
 public:
 	OutputDb(int queueLimit, const QJsonObject &params);
+	~OutputDb();
 	void next(const output_row_t &row) override;
 	void keyAdded(QHash<QString,QString> *table, QString name, QString value);
 
@@ -20,6 +22,7 @@ private:
 	QString      driver;
 	QSqlDatabase db;
 	bool         compressKeys;
+	QDateTime    lastCommit;
 	QHash<QString,QString> compressTable;
 };
 

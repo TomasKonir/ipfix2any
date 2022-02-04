@@ -15,10 +15,17 @@ OutputDb::OutputDb(int queueLimit, const QJsonObject &params) : Output(queueLimi
 		qInfo() << "Driver not available:" << driver;
 		return;
 	}
+	this->lastCommit = QDateTime::currentDateTime();
 	this->table = params.value("table").toString();
 	this->params = params;
 	this->compressKeys = params.value("compressKeys").toBool(false);
 	openDb();
+}
+
+OutputDb::~OutputDb(){
+	if(db.isOpen()){
+		db.commit();
+	}
 }
 
 void OutputDb::next(const output_row_t &row){
@@ -37,6 +44,9 @@ void OutputDb::next(const output_row_t &row){
 		QHash<QString,QString> added;
 		r = row2json(row,&compressTable,true,&added);
 		if(added.count()){
+			//force end transaction
+			db.commit();
+			lastCommit = QDateTime::currentDateTime();
 			foreach(QString k, added.keys()){
 				QSqlQuery aq(db);
 				aq.prepare("INSERT INTO " + table + "_keys(name,value) VALUES(:name,:value)");
@@ -57,6 +67,12 @@ void OutputDb::next(const output_row_t &row){
 	if(!query.exec()){
 		qInfo().noquote() << "Query exec failed for:" << r;
 		qInfo() << "With error:" << query.lastError().databaseText();
+	} else {
+		if(qAbs(lastCommit.secsTo(QDateTime::currentDateTime())) > 10){
+			db.commit();
+			db.transaction();
+			lastCommit = QDateTime::currentDateTime();
+		}
 	}
 }
 
@@ -97,4 +113,6 @@ void OutputDb::openDb(){
 		}
 		qInfo() << "Compress table loaded";
 	}
+	//begin transaction
+	db.transaction();
 }
