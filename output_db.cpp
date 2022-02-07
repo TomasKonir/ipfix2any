@@ -42,7 +42,7 @@ void OutputDb::next(const output_row_t &row){
 	QString r;
 	if(compressKeys){
 		QHash<QString,QString> added;
-		r = row2json(row,&compressTable,true,&added);
+		r = row2json(row,false,&compressTable,true,&added);
 		if(added.count()){
 			//force end transaction
 			db.commit();

@@ -9,6 +9,9 @@
 	"outputs" : [
 		{
 			"name" : "stdout",
+			"params" : {
+				"pretty" : true
+			},
 			"filters" : [
 				{
 					"name":"fields",

@@ -7,10 +7,11 @@
 
 class OutputStdout : public Output {
 public:
-	OutputStdout(int queueLimit, QList<Filter*> filterList);
+	OutputStdout(int queueLimit, QList<Filter*> filterList, QJsonObject params);
 	void next(const output_row_t &row) override;
 
 private:
+	bool pretty;
 	QTextStream out;
 	QHash<QString,QString> compressTable;
 };

@@ -89,7 +89,7 @@ void Output::enqueue(const output_row_t &row){
 	mutex.unlock();
 }
 
-QString Output::row2json(const output_row_t &row, QHash<QString,QString> *compressTable, bool autoAdd, QHash<QString, QString> *addedKeys){
+QString Output::row2json(const output_row_t &row, bool pretty, QHash<QString,QString> *compressTable, bool autoAdd, QHash<QString, QString> *addedKeys){
 	QString ret;
 
 	ret = "{";
@@ -99,6 +99,9 @@ QString Output::row2json(const output_row_t &row, QHash<QString,QString> *compre
 			coma = true;
 		} else {
 			ret += ", ";
+		}
+		if(pretty){
+			ret += "\n\t";
 		}
 		if(compressTable != nullptr){
 			if(compressTable->contains(f.name)){
@@ -117,6 +120,9 @@ QString Output::row2json(const output_row_t &row, QHash<QString,QString> *compre
 		} else {
 			ret += "\"" + f.name + "\" : " + f.value;
 		}
+	}
+	if(pretty){
+		ret += "\n";
 	}
 	ret += "}";
 

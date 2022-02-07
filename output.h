@@ -37,7 +37,7 @@ public:
 	void run();
 
 	//helper
-	QString row2json(const output_row_t &row, QHash<QString, QString> *compressTable = nullptr, bool autoAdd = false, QHash<QString,QString> *addedKeys = nullptr);
+	QString row2json(const output_row_t &row, bool pretty = false, QHash<QString, QString> *compressTable = nullptr, bool autoAdd = false, QHash<QString,QString> *addedKeys = nullptr);
 
 	//need to be implemented in subclasses
 	virtual void next(const output_row_t &row) = 0;

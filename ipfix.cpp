@@ -96,7 +96,7 @@ IPFIX::IPFIX(const QJsonArray fd, long ql, const QJsonObject fixes, const QJsonA
 			if(name == "null"){
 				outputList << new OutputNull(queueLimit,filterList);
 			} else if(name == "stdout"){
-				outputList << new OutputStdout(queueLimit,filterList);
+				outputList << new OutputStdout(queueLimit,filterList,params);
 			} else if(name == "db"){
 				outputList << new OutputDb(queueLimit,filterList,params);
 			} else {
