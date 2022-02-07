@@ -7,6 +7,7 @@
 #include "output_null.h"
 #include "output_stdout.h"
 #include "output_db.h"
+#include "filter_fields.h"
 
 IPFIX::IPFIX(const QJsonArray fd, long ql, const QJsonObject fixes, const QJsonArray outputs, bool d) : debug(d), queueLimit(ql){
 	mikrotikFixTimestamp = fixes.value("mikrotikFixTimestamp").toBool(false);
@@ -77,12 +78,27 @@ IPFIX::IPFIX(const QJsonArray fd, long ql, const QJsonObject fixes, const QJsonA
 			QJsonObject o = v.toObject();
 			QJsonObject params = o.value("params").toObject();
 			QString name = o.value("name").toString();
+			QJsonArray filterArray = o.value("filters").toArray();
+			QList<Filter *> filterList;
+			for(const QJsonValue &v : filterArray){
+				if(!v.isObject()){
+					continue;
+				}
+				QJsonObject o = v.toObject();
+				QString name = o.value("name").toString();
+				if(name == "fields"){
+					filterList << new FilterFields(o.value("params").toObject());
+				} else {
+					qInfo() << "Unknown filter:" << name;
+				}
+			}
+
 			if(name == "null"){
-				outputList << new OutputNull(queueLimit);
+				outputList << new OutputNull(queueLimit,filterList);
 			} else if(name == "stdout"){
-				outputList << new OutputStdout(queueLimit);
+				outputList << new OutputStdout(queueLimit,filterList);
 			} else if(name == "db"){
-				outputList << new OutputDb(queueLimit,params);
+				outputList << new OutputDb(queueLimit,filterList,params);
 			} else {
 				qInfo() << "Unknown output:" << name;
 			}

@@ -3,7 +3,7 @@
 #include <QDebug>
 #include "output_db.h"
 
-OutputDb::OutputDb(int queueLimit, const QJsonObject &params) : Output(queueLimit) {
+OutputDb::OutputDb(int queueLimit, QList<Filter *> filterList, const QJsonObject &params) : Output(queueLimit,filterList) {
 	foreach(QString s, QStringList({"driver","host","port","dbName","user","password","table"})){
 		if(!params.contains(s)){
 			qInfo() << "DB Parameter missing:" << s;

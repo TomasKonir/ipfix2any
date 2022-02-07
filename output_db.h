@@ -8,7 +8,7 @@
 
 class OutputDb : public Output {
 public:
-	OutputDb(int queueLimit, const QJsonObject &params);
+	OutputDb(int queueLimit, QList<Filter *> filterList, const QJsonObject &params);
 	~OutputDb();
 	void next(const output_row_t &row) override;
 	void keyAdded(QHash<QString,QString> *table, QString name, QString value);

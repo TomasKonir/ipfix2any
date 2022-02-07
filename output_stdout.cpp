@@ -1,7 +1,7 @@
 #include <QDebug>
 #include "output_stdout.h"
 
-OutputStdout::OutputStdout(int queueLimit) : Output(queueLimit), out(stdout){
+OutputStdout::OutputStdout(int queueLimit, QList<Filter *> filterList) : Output(queueLimit,filterList), out(stdout){
 	//just for super constructor
 }
 

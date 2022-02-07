@@ -5,7 +5,7 @@
 
 class OutputNull : public Output {
 public:
-	OutputNull(int queueLimit);
+	OutputNull(int queueLimit, QList<Filter*> filterList);
 	void next(const output_row_t &row) override;
 };
 

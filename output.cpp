@@ -35,6 +35,10 @@ static QString nextval(QHash<QString,QString> *compressTable){
 	return(ret);
 }
 
+Filter::Filter(const QJsonObject params){
+	Q_UNUSED(params);
+}
+
 Output::Output(int ql, QList<Filter *> filterList) : queueLimit(ql){
 	this->filterList = filterList;
 	start();

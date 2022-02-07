@@ -7,7 +7,7 @@
 
 class OutputStdout : public Output {
 public:
-	OutputStdout(int queueLimit);
+	OutputStdout(int queueLimit, QList<Filter*> filterList);
 	void next(const output_row_t &row) override;
 
 private:

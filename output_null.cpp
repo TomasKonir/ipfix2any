@@ -1,6 +1,6 @@
 #include "output_null.h"
 
-OutputNull::OutputNull(int queueLimit) : Output(queueLimit){
+OutputNull::OutputNull(int queueLimit, QList<Filter*> filterList) : Output(queueLimit,filterList){
 	//just for super constructor
 }
 

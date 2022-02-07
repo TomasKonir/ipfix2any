@@ -6,6 +6,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
+#include <QJsonObject>
 
 typedef struct {
 	QString    name;
@@ -22,7 +23,7 @@ typedef struct {
 
 class Filter : public QObject {
 public:
-	Filter(QJsonObject params);
+	Filter(const QJsonObject params);
 
 	//need to be implemented in subclasses ... return true if record is ready to output
 	virtual bool next(output_row_t &row) = 0;
@@ -30,7 +31,7 @@ public:
 
 class Output : public QThread {
 public:
-	Output(int queueLimit, QList<Filter*> filterList = QList<Filter*>());
+	Output(int queueLimit, QList<Filter*> filterList);
 	~Output();
 	void enqueue(const output_row_t &row);
 	void run();

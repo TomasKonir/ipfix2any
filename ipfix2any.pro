@@ -8,6 +8,7 @@ CONFIG -= app_bundle
 
 SOURCES += main.cpp \
 	convert.cpp \
+	filter_fields.cpp \
 	ipfix.cpp \
 	output.cpp \
 	output_null.cpp \
@@ -16,6 +17,7 @@ SOURCES += main.cpp \
 
 HEADERS += \
 	convert.h \
+	filter_fields.h \
 	ipfix.h \
 	output.h \
 	output_null.h \
