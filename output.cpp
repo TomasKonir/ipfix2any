@@ -41,11 +41,12 @@ Output::Output(int ql) : queueLimit(ql){
 
 void Output::run(){
 	while(true){
+		mutex.lock();
 		if(!queue.isEmpty()){
 			output_row_t r = queue.dequeue();
+			mutex.unlock();
 			next(r);
 		} else {
-			mutex.lock();
 			waitCondition.wait(&mutex,1000);
 			mutex.unlock();
 		}
@@ -56,11 +57,13 @@ void Output::run(){
 }
 
 void Output::enqueue(const output_row_t &row){
+	mutex.lock();
 	if(queue.count() > queueLimit){
 		qInfo() << "Queue limit reached";
 	}
 	queue.enqueue(row);
 	waitCondition.wakeOne();
+	mutex.unlock();
 }
 
 QString Output::row2json(const output_row_t &row, QHash<QString,QString> *compressTable, bool autoAdd, QHash<QString, QString> *addedKeys){
