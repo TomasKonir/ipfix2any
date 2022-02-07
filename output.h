@@ -20,9 +20,18 @@ typedef struct {
 	QList<output_field_t>	fields;
 } output_row_t;
 
+class Filter : public QObject {
+public:
+	Filter(QJsonObject params);
+
+	//need to be implemented in subclasses ... return true if record is ready to output
+	virtual bool next(output_row_t &row) = 0;
+};
+
 class Output : public QThread {
 public:
-	Output(int queueLimit);
+	Output(int queueLimit, QList<Filter*> filterList = QList<Filter*>());
+	~Output();
 	void enqueue(const output_row_t &row);
 	void run();
 
@@ -37,6 +46,7 @@ protected:
 	QQueue<output_row_t>			queue;
 	QMutex							mutex;
 	QWaitCondition					waitCondition;
+	QList<Filter*>					filterList;
 };
 
 #endif

@@ -35,17 +35,36 @@ static QString nextval(QHash<QString,QString> *compressTable){
 	return(ret);
 }
 
-Output::Output(int ql) : queueLimit(ql){
+Output::Output(int ql, QList<Filter *> filterList) : queueLimit(ql){
+	this->filterList = filterList;
 	start();
 }
 
+Output::~Output(){
+	foreach(Filter *f, filterList){
+		delete(f);
+	}
+	filterList.clear();
+}
+
 void Output::run(){
+	int filterCount = filterList.count();
 	while(true){
 		mutex.lock();
 		if(!queue.isEmpty()){
 			output_row_t r = queue.dequeue();
 			mutex.unlock();
-			next(r);
+			bool ready2process = true;
+			if(filterCount){
+				foreach(Filter *f, filterList){
+					if(!f->next(r)){
+						break;
+					}
+				}
+			}
+			if(ready2process){
+				next(r);
+			}
 		} else {
 			waitCondition.wait(&mutex,1000);
 			mutex.unlock();
