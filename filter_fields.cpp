@@ -19,10 +19,10 @@ FilterFields::FilterFields(const QJsonObject params) : Filter(params){
 bool FilterFields::next(output_row_t &row){
 	for(int i=0;i<row.fields.count();i++){
 		if(pass.count() && !pass.contains(row.fields[i].name)){
-			row.fields.remove(i);
+			row.fields.removeAt(i);
 			i--;
 		} else if(remove.count() && remove.contains(row.fields[i].name)){
-			row.fields.remove(i);
+			row.fields.removeAt(i);
 			i--;
 		}
 	}
