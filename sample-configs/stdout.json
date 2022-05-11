@@ -16,7 +16,30 @@
 				{
 					"name":"fields",
 					"params" : {
-						"remove" : ["ipClassOfService","ingressInterface","egressInterface"]
+						"remove" : [
+							"ipClassOfService",
+							"ingressInterface",
+							"egressInterface",
+							"flowStartSysUpTime",
+							"flowEndSysUpTime",
+							"systemInitTimeMilliseconds",
+							"postDestinationMacAddress",
+							"destinationMacAddress",
+							"postSourceMacAddress",
+							"sourceMacAddress",
+							"ipNextHopIPv4Address",
+							"sourceIPv4PrefixLength",
+							"destinationIPv4PrefixLength",
+							"ipTTL",
+							"isMulticast",
+							"ipHeaderLength",
+							"ipTotalLength",
+							"udpMessageLength",
+							"tcpSequenceNumber",
+							"tcpAcknowledgementNumber",
+							"tcpWindowSize",
+							"igmpType"
+						]
 					}
 				}
 			]
