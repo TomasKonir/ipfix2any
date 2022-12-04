@@ -19,6 +19,11 @@ OutputDb::OutputDb(int queueLimit, QList<Filter *> filterList, const QJsonObject
 	this->table = params.value("table").toString();
 	this->params = params;
 	this->compressKeys = params.value("compressKeys").toBool(false);
+    this->partitioning = params.value("partitioning").toBool(false);
+    if(driver != "QPSQL" && this->partitioning){
+        qInfo() << "Partitioning is available for PSQL driver only";
+        this->partitioning = false;
+    }
 	openDb();
 }
 
@@ -61,8 +66,31 @@ void OutputDb::next(const output_row_t &row){
 	} else {
 		r = row2json(row);
 	}
+    QDateTime now = QDateTime::currentDateTimeUtc();
+    QString tableName = table;
+    if(partitioning){
+        tableName += now.toString("_yyyyMM");
+        if(!db.tables().contains(tableName)){
+            int year = now.date().year();
+            int month = now.date().month();
+            month++;
+            if(month > 12){
+                month = 1;
+                year++;
+            }
+            QString from = now.toString("yyyy-MM-01");
+            QString to = QString("%1-%2-01").arg(year,4,10,QChar('0')).arg(month,2,10,QChar('0'));
+            QString createTable = "CREATE TABLE " + tableName + " PARTITION OF " + table + " FOR VALUES FROM ('" + from + "') TO ('" + to + "')";
+            db.exec(createTable);
+            if(db.lastError().type() != QSqlError::NoError){
+                qInfo() << db.lastError().databaseText();
+            }
+            qInfo() << "Creating table partition: " << tableName << createTable;
+        }
+    }
 	QSqlQuery query(db);
-	query.prepare("INSERT INTO " + table + "(flow) VALUES(:row)");
+    query.prepare("INSERT INTO " + tableName + "(tstmp,flow) VALUES(:tstmp,:row)");
+    query.addBindValue(now);
 	query.addBindValue(r);
 	if(!query.exec()){
 		qInfo().noquote() << "Query exec failed for:" << r;
@@ -89,19 +117,29 @@ void OutputDb::openDb(){
 	}
 	if(!db.tables().contains(table) || !db.tables().contains(table + "_keys")){
 		if(driver == "QPSQL"){
-			db.exec("CREATE TABLE IF NOT EXISTS " + table + "(id BIGSERIAL PRIMARY KEY NOT NULL, tstmp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, flow JSONB NOT NULL)");
+            if(partitioning){
+                db.exec("CREATE TABLE IF NOT EXISTS " + table + "(id BIGSERIAL NOT NULL, tstmp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, flow JSONB NOT NULL) PARTITION BY RANGE(tstmp)");
+            } else {
+                db.exec("CREATE TABLE IF NOT EXISTS " + table + "(id BIGSERIAL NOT NULL, tstmp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, flow JSONB NOT NULL)");
+            }
+            if(db.lastError().type() != QSqlError::NoError){
+                qInfo() << db.lastError().databaseText();
+            }
 			if(compressKeys){
-				db.exec("CREATE TABLE IF NOT EXISTS " + table + "_keys(name VARCHAR NOT NULL UNIQUE, value VARCHAR NOT NULL UNIQUE)");
-			}
+				db.exec("CREATE TABLE IF NOT EXISTS " + table + "_keys(name VARCHAR NOT NULL UNIQUE, value VARCHAR NOT NULL UNIQUE)");			
+                if(db.lastError().type() != QSqlError::NoError){
+                    qInfo() << db.lastError().databaseText();
+                }
+            }
 		} else {
 			db.exec("CREATE TABLE " + table + "(flow VARCHAR NOT NULL)");
 			if(compressKeys){
 				db.exec("CREATE TABLE " + table + "_keys(name VARCHAR NOT NULL, value VARCHAR NOT NULL)");
 			}
-		}
-		if(db.lastError().type() != QSqlError::NoError){
-			qInfo() << db.lastError().databaseText();
-		}
+            if(db.lastError().type() != QSqlError::NoError){
+                qInfo() << db.lastError().databaseText();
+            }
+		}		
 	}
 	if(compressKeys){
 		qInfo() << "Loading compress table";

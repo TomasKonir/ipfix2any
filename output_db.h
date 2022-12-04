@@ -23,6 +23,7 @@ private:
 	QSqlDatabase db;
 	bool         compressKeys;
 	QDateTime    lastCommit;
+    bool         partitioning;
 	QHash<QString,QString> compressTable;
 };
 
