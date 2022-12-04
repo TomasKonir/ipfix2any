@@ -12,7 +12,6 @@ static QString nextval(QHash<QString,QString> *compressTable){
             return(a < b);
         }
     });
-    qInfo() << vals;
     if(vals.count() == 0){
         return(charTable[0]);
     }
