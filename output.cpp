@@ -3,36 +3,36 @@
 
 static const QString charTable("abcdefghijklmnopqrstuvwxyz");
 
-static QString nextval(QHash<QString,QString> *compressTable){
-	QStringList vals = compressTable->values();
-	int base = charTable.count();
-	quint64 max = 0;
-	foreach(QString v, vals){
-		quint64 mult = 1;
-		quint64 m = 0;
-		foreach(QChar c, v){
-			int index = charTable.indexOf(c);
-			if(index >= 0){
-				m += index * mult;
-				mult *= base;
-			}
-		}
-		if(m > max){
-			max = m;
-		}
-	}
+static QString nextval(QHash<QString,QString> *compressTable){    
+    QStringList vals = compressTable->values();
+    std::sort(vals.begin(), vals.end(),[](const QString &a, QString &b){
+        if(a.count() != b.count()){
+            return(a.count() < b.count());
+        } else {
+            return(a < b);
+        }
+    });
+    qInfo() << vals;
+    if(vals.count() == 0){
+        return(charTable[0]);
+    }
+    QString ret = vals.last();
 
-	if(vals.count()){
-		max++;
-	}
+    for(int i = (ret.count() - 1); i >= 0;i--){
+        QChar ch    = ret[i];
+        int   index = charTable.indexOf(ch) + 1;
+        if(index < charTable.count()){
+            ret[i] = charTable[index];
+            break;
+        } else {
+            ret[i] = charTable[0];
+            if(i == 0){
+                ret = charTable[0] + ret;
+            }
+        }
+    }
 
-	QString ret("");
-	do {
-		ret += charTable.at(max % base);
-		max /= base;
-	} while(max > 0);
-
-	return(ret);
+    return(ret);
 }
 
 Filter::Filter(const QJsonObject params){
