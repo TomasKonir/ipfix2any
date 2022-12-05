@@ -24,6 +24,7 @@ private:
 	bool         compressKeys;
 	QDateTime    lastCommit;
     bool         partitioning;
+    int          keepPartitions;
 	QHash<QString,QString> compressTable;
 };
 

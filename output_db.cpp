@@ -20,6 +20,7 @@ OutputDb::OutputDb(int queueLimit, QList<Filter *> filterList, const QJsonObject
 	this->params = params;
 	this->compressKeys = params.value("compressKeys").toBool(false);
     this->partitioning = params.value("partitioning").toBool(false);
+    this->keepPartitions = params.value("keepPartitions").toInt();
     if(driver != "QPSQL" && this->partitioning){
         qInfo() << "Partitioning is available for PSQL driver only";
         this->partitioning = false;
@@ -86,6 +87,23 @@ void OutputDb::next(const output_row_t &row){
                 qInfo() << db.lastError().databaseText();
             }
             qInfo() << "Creating table partition: " << tableName << createTable;
+            if(keepPartitions > 0){
+                QStringList tables;
+                foreach(QString t, db.tables()){
+                    if(t.startsWith(table + "_") && t != (table + "_keys")){
+                        tables << t;
+                    }
+                }
+                tables.sort();
+                for(int i=0;i<keepPartitions;i++){
+                    if(tables.count() > 0){
+                        tables.removeLast();
+                    }
+                }
+                foreach(QString t, tables){
+                    db.exec("DROP TABLE " + t);
+                }
+            }
         }
     }
 	QSqlQuery query(db);
