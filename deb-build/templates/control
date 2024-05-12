@@ -1,0 +1,11 @@
+Package: ipfix2any
+Version: #VERSION#
+Priority: optional
+Architecture: #ARCH#
+Section: net
+Homepage: http://hidden.tech
+Installed-Size: #SIZE#
+Maintainer: Tom
+Description: K software
+Source: none
+Depends: #DEPENDS#

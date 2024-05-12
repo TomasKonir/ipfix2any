@@ -1,0 +1,12 @@
+[Unit]
+Description=Save IPFIX in any format
+Requires=network.target
+AllowIsolate=yes
+
+[Service]
+ExecStart=/usr/bin/ipfix2any /etc/ipfix2any.json
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+
