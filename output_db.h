@@ -11,7 +11,6 @@ public:
 	OutputDb(int queueLimit, QList<Filter *> filterList, const QJsonObject &params);
 	~OutputDb();
 	void next(const output_row_t &row) override;
-	void keyAdded(QHash<QString,QString> *table, QString name, QString value);
 
 private:
 	void openDb();
@@ -24,6 +23,8 @@ private:
 	bool         compressKeys;
 	QDateTime    lastCommit;
     bool         partitioning;
+    QJsonObject  optimizedTableFields;
+    QStringList  optimizedTableWildcards;
     int          keepPartitions;
 	QHash<QString,QString> compressTable;
 };
