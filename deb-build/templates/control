@@ -3,7 +3,7 @@ Version: #VERSION#
 Priority: optional
 Architecture: #ARCH#
 Section: net
-Homepage: http://hidden.tech
+Homepage: http://no-homepage
 Installed-Size: #SIZE#
 Maintainer: Tom
 Description: K software
