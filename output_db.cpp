@@ -132,6 +132,7 @@ void OutputDb::next(const output_row_t& row) {
             db.exec(createTable);
             if (db.lastError().type() != QSqlError::NoError) {
                 qInfo() << db.lastError().databaseText();
+                return;
             }
             qInfo() << "Creating table partition: " << tableName << createTable;
             if (keepPartitions > 0) {

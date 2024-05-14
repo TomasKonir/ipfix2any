@@ -4,6 +4,8 @@ VERSION=$(date +%Y%m%d%H%M)
 
 rsync -avpx --delete $(dirname $0)/ deb-build/
 cp -f bin/* deb-build/build/usr/bin/
+rm -f deb-build/build/etc/ipfix2any.json
+cp -f deb-build/build/usr/share/ipfix2any/psql.json deb-build/build/etc/ipfix2any.json
 
 if [ "$(which dpkg-architecture)" ==  "" ]; then
     echo "dpkg-architekture is missing ... probably build-essential package"

@@ -63,7 +63,7 @@ quint64 getUnsignedNum(const char *data, long length){
 
 QString msecs2string(quint64 n){
 	QDateTime t = QDateTime::fromMSecsSinceEpoch(n);
-	return("\"" + t.toString("dd.MM.yyyyThh:mm:ss.zzz") + "\"");
+	return("\"" + t.toString("yyyy-MM-ddThh:mm:ss.zzz") + "\"");
 }
 
 QString convertSignedNumber(const char *data, long length){

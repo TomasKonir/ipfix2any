@@ -308,8 +308,8 @@ void IPFIX::processTemplates(const char* data, long remain, QString ident) {
 void IPFIX::processDataset(const char* data, long remaing, int id, QString ident, quint32 exportTime) {
     quint64 now = QDateTime::currentMSecsSinceEpoch();
     QString index = ident + "_" + QString::number(id);
-    QString exportTimeString = QDateTime::fromSecsSinceEpoch(exportTime).toString("dd.MM.yyyyThh:mm:ss");
-    QString nowTimeString = QDateTime::currentDateTime().toString("dd.MM.yyyyThh:mm:ss.zzz");
+    QString exportTimeString = QDateTime::fromSecsSinceEpoch(exportTime).toString("yyyy-MM-ddThh:mm:ss");
+    QString nowTimeString = QDateTime::currentDateTime().toString("yyyy-MM-ddThh:mm:ss.zzz");
     ident = ident.remove("::ffff:");  // remove ipv6 like garbage
     ident = ident.split("_").first();
     if (!templates.contains(index)) {
